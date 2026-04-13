@@ -1,0 +1,115 @@
+🌿 NatureVeda
+“Herbal solutions for everyday health.”
+________________________________________
+🧾 Project Summary
+NatureVeda is a full-stack web application that provides users with natural remedies and medicinal plant information for everyday health problems. The platform allows users to search for common issues like cough, skin problems, or hair care and get safe, home-based herbal solutions using easily available ingredients.
+In addition to remedies, the website includes a medicinal plants section, where users can explore the uses, benefits, and applications of various plants like tulsi, aloe vera, and neem. The system also supports user authentication, enabling users to register, log in, and save their favorite remedies for future reference.
+An admin panel is included to manage the content of the website, allowing the admin to add, update, or delete remedies and plant information. The website also features a theme toggle (light/dark mode) to enhance user experience.
+Overall, NatureVeda is designed as a user-friendly, informative, and practical platform that combines traditional herbal knowledge with modern web technology.
+________________________________________
+⚙️ Tech Stack
+🎨 Frontend
+•	React.js 
+o	Component-based UI 
+o	Responsive design 
+o	Theme toggle (Light/Dark mode) 
+________________________________________
+🧠 Backend
+•	PHP 
+o	Handles API requests 
+o	Manages authentication 
+o	Connects frontend with database 
+________________________________________
+🗄️ Database
+•	MySQL 
+o	Stores users 
+o	Stores remedies 
+o	Stores medicinal plant data 
+o	Stores favorites 
+________________________________________
+🌙 Special Feature (Included)
+Theme Toggle (Dark Mode)
+•	User can switch between Light mode ☀️ and Dark mode 🌙 
+•	Improves UI experience 
+•	Gives modern look to your project
+________________________________________
+⚙️ Complete Functionalities of the Project
+________________________________________
+👤 1. User Authentication System
+•	User Registration (Sign Up) 
+•	User Login / Logout 
+•	Secure user data storage 
+•	Session handling 
+________________________________________
+🔍 2. Search Functionality
+•	Search remedies by problem (e.g., cough, acne) 
+•	Quick and dynamic results 
+•	Helps users easily find solutions 
+________________________________________
+🌿 3. Remedies Module (Core Feature)
+•	View list of remedies 
+•	Each remedy includes: 
+o	Problem name 
+o	Ingredients 
+o	Preparation steps 
+o	Precautions 
+•	Organized by categories: 
+o	Health (cough, cold, digestion) 
+o	Skin care 
+o	Hair care 
+________________________________________
+🌱 4. Medicinal Plants Module
+•	Display list of plants 
+•	Each plant shows: 
+o	Name 
+o	Uses 
+o	Benefits 
+o	How to use 
+•	Helps users understand plant-based healing 
+________________________________________
+💄 5. Beauty & Personal Care Module
+•	Natural face packs 
+•	Hair care remedies 
+•	Skin care tips 
+________________________________________
+⭐ 6. Favorites / Bookmark Feature
+•	Users can save remedies 
+•	View saved remedies later 
+•	Stored in database 
+________________________________________
+🧑💼 7. Admin Panel (Backend Control)
+•	Admin login 
+•	Add new remedies 
+•	Update existing remedies 
+•	Delete remedies 
+•	Add/Edit/Delete medicinal plants 
+👉 This covers full CRUD operations
+________________________________________
+🌙 8. Theme Toggle (Light/Dark Mode)
+•	Switch between light and dark themes 
+•	Improves user experience 
+•	Modern UI feature 
+________________________________________
+🏠 9. Home Page Features
+•	Search bar 
+•	Categories section 
+•	Highlight important remedies 
+•	Easy navigation 
+________________________________________
+🗄️ 10. Database Management
+•	Store user details 
+•	Store remedies data 
+•	Store plant information 
+•	Store user favorites 
+________________________________________
+⚠️ 11. Disclaimer Section
+•	Shows health advisory: 
+o	“Consult a doctor for serious conditions” 
+________________________________________
+🔄 System Flow (How it works)
+1.	User registers/logs in 
+2.	Searches for a problem 
+3.	Views remedies 
+4.	Saves favorites 
+5.	Admin manages content from backend 
+
