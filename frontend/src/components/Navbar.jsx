@@ -20,15 +20,16 @@ const Nav = styled.nav`
 `;
 
 const NavContainer = styled.div`
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 0 20px;
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  padding: 0 28px;
   display: flex;
   justify-content: space-between;
   align-items: center;
 
   @media (max-width: 768px) {
-    padding: 0 15px;
+    padding: 0 16px;
   }
 `;
 
@@ -180,6 +181,27 @@ const LogoutMenuLink = styled.button`
   }
 `;
 
+const UserGreeting = styled.div`
+  color: var(--primary-green);
+  font-weight: 600;
+  font-size: 1rem;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  max-width: 220px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+
+  @media (max-width: 900px) {
+    max-width: 160px;
+  }
+
+  @media (max-width: 768px) {
+    max-width: unset;
+  }
+`;
+
 const Navbar = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
@@ -200,6 +222,8 @@ const Navbar = () => {
     setIsOpen(false);
   };
 
+  const firstName = user?.name ? String(user.name).trim().split(/\s+/)[0] : '';
+
   return (
     <Nav theme={document.body.getAttribute('data-theme')} style={{
       padding: scrolled ? '0.5rem 0' : '1rem 0',
@@ -218,26 +242,19 @@ const Navbar = () => {
           <MenuLink to="/" onClick={() => setIsOpen(false)}>Home</MenuLink>
           <MenuLink to="/remedies" onClick={() => setIsOpen(false)}>Remedies</MenuLink>
           <MenuLink to="/plants" onClick={() => setIsOpen(false)}>Plants</MenuLink>
-          <MenuLink to="/beauty-care" onClick={() => setIsOpen(false)}>Beauty Care</MenuLink>
           
           {user ? (
             <>
+              <MenuLink to="/favorites" onClick={() => setIsOpen(false)}>Favorites</MenuLink>
               {user.is_admin && (
                 <MenuLink to="/admin/dashboard" onClick={() => setIsOpen(false)}>
                   Admin Dashboard
                 </MenuLink>
               )}
-              <div style={{ 
-                color: 'var(--primary-green)', 
-                fontWeight: '600', 
-                fontSize: '1rem',
-                display: 'flex',
-                alignItems: 'center',
-                gap: '8px'
-              }}>
+              <UserGreeting title={user.name || ''}>
                 <FaUser />
-                Welcome, {user.name}
-              </div>
+                {firstName ? `Hi, ${firstName}` : 'Hi'}
+              </UserGreeting>
               <LogoutMenuLink onClick={() => { handleLogout(); setIsOpen(false); }}>
                 Logout
               </LogoutMenuLink>

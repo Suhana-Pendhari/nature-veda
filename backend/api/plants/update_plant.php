@@ -25,6 +25,7 @@ if (!empty($data->id)) {
               name = :name,
               uses = :uses,
               benefits = :benefits,
+              category = :category,
               image_url = :image_url
               WHERE id = :id";
     
@@ -34,12 +35,14 @@ if (!empty($data->id)) {
     $name = htmlspecialchars(strip_tags($data->name));
     $uses = htmlspecialchars(strip_tags($data->uses));
     $benefits = htmlspecialchars(strip_tags($data->benefits));
+    $category = htmlspecialchars(strip_tags($data->category ?? 'General'));
     $image_url = htmlspecialchars(strip_tags($data->image_url ?? ''));
     
     $stmt->bindParam(':id', $id);
     $stmt->bindParam(':name', $name);
     $stmt->bindParam(':uses', $uses);
     $stmt->bindParam(':benefits', $benefits);
+    $stmt->bindParam(':category', $category);
     $stmt->bindParam(':image_url', $image_url);
     
     if ($stmt->execute()) {

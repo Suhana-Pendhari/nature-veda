@@ -1,8 +1,20 @@
 <?php
-header("Access-Control-Allow-Origin: http://localhost:3000");
+$allowed_origins = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3001'
+];
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (in_array($origin, $allowed_origins, true)) {
+    header("Access-Control-Allow-Origin: $origin");
+} else {
+    header("Access-Control-Allow-Origin: http://localhost:3000");
+}
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
 header("Access-Control-Allow-Credentials: true");
+header("Content-Type: application/json");
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
     http_response_code(200);
@@ -26,7 +38,8 @@ if (!empty($data->id)) {
               ingredients = :ingredients,
               steps = :steps,
               precautions = :precautions,
-              category = :category
+              category = :category,
+              image_url = :image_url
               WHERE id = :id";
     
     $stmt = $pdo->prepare($query);
@@ -37,6 +50,7 @@ if (!empty($data->id)) {
     $steps = htmlspecialchars(strip_tags($data->steps));
     $precautions = htmlspecialchars(strip_tags($data->precautions ?? ''));
     $category = htmlspecialchars(strip_tags($data->category ?? 'General'));
+    $image_url = htmlspecialchars(strip_tags($data->image_url ?? ''));
     
     $stmt->bindParam(':id', $id);
     $stmt->bindParam(':problem', $problem);
@@ -44,6 +58,7 @@ if (!empty($data->id)) {
     $stmt->bindParam(':steps', $steps);
     $stmt->bindParam(':precautions', $precautions);
     $stmt->bindParam(':category', $category);
+    $stmt->bindParam(':image_url', $image_url);
     
     if ($stmt->execute()) {
         http_response_code(200);

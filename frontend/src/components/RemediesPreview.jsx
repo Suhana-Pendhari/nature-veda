@@ -22,6 +22,7 @@ const Section = styled.section`
     bottom: 0;
     background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M10,50 Q25,25 40,50 T70,50 T100,50" fill="none" stroke="%231B5E20" stroke-width="0.5" opacity="0.1"/></svg>');
     background-size: 100px 100px;
+    pointer-events: none;
   }
 `;
 
@@ -47,9 +48,21 @@ const SectionSubtitle = styled.p`
 
 const RemedyGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 30px;
   position: relative;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const RemedyCard = styled(motion.div)`
@@ -81,6 +94,31 @@ const RemedyCard = styled(motion.div)`
   &:hover {
     transform: translateY(-8px);
     box-shadow: 0 20px 40px rgba(27, 94, 32, 0.15);
+  }
+`;
+
+const CardImage = styled.div`
+  width: 100%;
+  height: 180px;
+  border-radius: 14px;
+  overflow: hidden;
+  margin-bottom: 18px;
+  background: linear-gradient(135deg, rgba(27, 94, 32, 0.08), rgba(120, 144, 156, 0.08));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    display: block;
+  }
+
+  svg {
+    font-size: 3rem;
+    color: var(--primary-green);
+    opacity: 0.4;
   }
 `;
 
@@ -177,7 +215,7 @@ const RemediesPreview = () => {
   const fetchRemedies = async () => {
     try {
       const response = await axios.get('http://localhost:8000/api/remedies/get_remedies.php');
-      setRemedies(response.data.slice(0, 4)); // Show only 4 remedies
+      setRemedies(response.data.slice(0, 3)); // Show only 3 remedies
       setLoading(false);
     } catch (error) {
       console.error('Error fetching remedies:', error);
@@ -272,6 +310,13 @@ const RemediesPreview = () => {
         >
           {remedies.map((remedy) => (
             <RemedyCard key={remedy.id} variants={itemVariants}>
+              <CardImage>
+                {remedy.image_url ? (
+                  <img src={remedy.image_url} alt={remedy.problem} />
+                ) : (
+                  <FaLeaf />
+                )}
+              </CardImage>
               <CardHeader>
                 <ProblemTitle>
                   <FaLeaf />
@@ -289,7 +334,7 @@ const RemediesPreview = () => {
               <Text>{remedy.ingredients}</Text>
 
               <SectionLabel>How to Use:</SectionLabel>
-              <Text>{remedy.steps.substring(0, 100)}...</Text>
+              <Text>{remedy.steps}</Text>
 
               {remedy.precautions && (
                 <>

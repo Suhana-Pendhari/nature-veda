@@ -21,7 +21,7 @@ const HeroSection = styled.section`
     right: 0;
     bottom: 0;
     background: radial-gradient(circle at center, transparent 0%, var(--cream) 100%);
-    opacity: 0.4;
+    opacity: 0.35;
   }
 `;
 

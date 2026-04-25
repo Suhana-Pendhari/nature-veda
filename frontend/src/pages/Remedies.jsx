@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
 import { FaLeaf, FaSearch, FaHeart, FaRegHeart } from 'react-icons/fa';
@@ -8,6 +9,7 @@ import Footer from '../components/Footer';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { useAuth } from '../context/AuthContext';
 
+// Styled Components
 const PageWrapper = styled.div`
   min-height: 100vh;
   background: var(--cream);
@@ -114,7 +116,7 @@ const FavoriteButton = styled.button`
   border: none;
   font-size: 1.3rem;
   cursor: pointer;
-  color: ${props => props.isFavorite ? '#e74c3c' : 'var(--light-brown)'};
+  color: ${props => (props.$isFavorite ? '#e74c3c' : 'var(--light-brown)')};
   transition: var(--transition);
 
   &:hover {
@@ -122,10 +124,36 @@ const FavoriteButton = styled.button`
   }
 `;
 
-const SectionTitle = styled.h4`
+const CardImage = styled.div`
+  width: 100%;
+  height: 180px;
+  background: rgba(85, 107, 47, 0.1);
+  border-radius: 12px;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+
+  img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  svg {
+    font-size: 4rem;
+    color: var(--olive-green);
+    opacity: 0.6;
+  }
+`;
+
+const SectionLabel = styled.h4`
   color: var(--primary-green);
-  margin: 15px 0 10px 0;
-  font-size: 1.1rem;
+  margin: 15px 0 8px 0;
+  font-size: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
 `;
 
 const Text = styled.p`
@@ -158,6 +186,12 @@ const ErrorMessage = styled.div`
   font-size: 1.2rem;
 `;
 
+// Animation variants
+const itemVariants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+};
+
 const Remedies = () => {
   const [remedies, setRemedies] = useState([]);
   const [filteredRemedies, setFilteredRemedies] = useState([]);
@@ -172,8 +206,7 @@ const Remedies = () => {
     if (user) {
       fetchFavorites();
     }
-    
-    // Check for search param in URL
+
     const params = new URLSearchParams(window.location.search);
     const search = params.get('search');
     if (search) {
@@ -190,8 +223,7 @@ const Remedies = () => {
       setLoading(true);
       setError(null);
       const response = await axios.get('http://localhost:8000/api/remedies/get_remedies.php');
-      
-      // Ensure the response data is an array
+
       const data = Array.isArray(response.data) ? response.data : [];
       setRemedies(data);
       setFilteredRemedies(data);
@@ -208,12 +240,11 @@ const Remedies = () => {
   const fetchFavorites = async () => {
     try {
       const response = await axios.get('http://localhost:8000/api/favorites/get_favorites.php', {
-        withCredentials: true
+        withCredentials: true,
       });
-      
-      // Ensure favorites data is an array
+
       const data = Array.isArray(response.data) ? response.data : [];
-      setFavorites(data.map(f => f.id));
+      setFavorites(data.map((f) => f.id));
     } catch (error) {
       console.error('Error fetching favorites:', error);
       setFavorites([]);
@@ -221,21 +252,24 @@ const Remedies = () => {
   };
 
   const filterRemedies = () => {
-    // Ensure remedies is an array
     if (!Array.isArray(remedies)) {
       setFilteredRemedies([]);
       return;
     }
-    
+
     if (!searchTerm || searchTerm.trim() === '') {
       setFilteredRemedies(remedies);
       return;
     }
-    
-    const filtered = remedies.filter(remedy =>
-      (remedy.problem && remedy.problem.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (remedy.ingredients && remedy.ingredients.toLowerCase().includes(searchTerm.toLowerCase())) ||
-      (remedy.category && remedy.category.toLowerCase().includes(searchTerm.toLowerCase()))
+
+    const filtered = remedies.filter(
+      (remedy) =>
+        (remedy.problem &&
+          remedy.problem.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (remedy.ingredients &&
+          remedy.ingredients.toLowerCase().includes(searchTerm.toLowerCase())) ||
+        (remedy.category &&
+          remedy.category.toLowerCase().includes(searchTerm.toLowerCase()))
     );
     setFilteredRemedies(filtered);
   };
@@ -248,13 +282,15 @@ const Remedies = () => {
 
     try {
       if (favorites.includes(remedyId)) {
-        await axios.post('http://localhost:8000/api/favorites/remove_favorite.php',
+        await axios.post(
+          'http://localhost:8000/api/favorites/remove_favorite.php',
           { remedy_id: remedyId },
           { withCredentials: true }
         );
-        setFavorites(favorites.filter(id => id !== remedyId));
+        setFavorites(favorites.filter((id) => id !== remedyId));
       } else {
-        await axios.post('http://localhost:8000/api/favorites/add_favorite.php',
+        await axios.post(
+          'http://localhost:8000/api/favorites/add_favorite.php',
           { remedy_id: remedyId },
           { withCredentials: true }
         );
@@ -286,7 +322,7 @@ const Remedies = () => {
           <ErrorMessage>
             <FaLeaf style={{ fontSize: '3rem', marginBottom: '20px', opacity: 0.5 }} />
             <p>{error}</p>
-            <button 
+            <button
               onClick={fetchRemedies}
               style={{
                 marginTop: '20px',
@@ -295,7 +331,7 @@ const Remedies = () => {
                 color: 'white',
                 border: 'none',
                 borderRadius: '5px',
-                cursor: 'pointer'
+                cursor: 'pointer',
               }}
             >
               Retry
@@ -307,13 +343,12 @@ const Remedies = () => {
     );
   }
 
-  // Ensure filteredRemedies is an array before mapping
   const remediesToDisplay = Array.isArray(filteredRemedies) ? filteredRemedies : [];
 
   return (
     <PageWrapper>
       <Navbar />
-      
+
       <Header>
         <div className="container">
           <Title>Herbal Remedies</Title>
@@ -340,7 +375,7 @@ const Remedies = () => {
             <FaLeaf style={{ fontSize: '3rem', marginBottom: '20px', opacity: 0.5 }} />
             <p>No remedies found {searchTerm && `matching "${searchTerm}"`}</p>
             {searchTerm && (
-              <button 
+              <button
                 onClick={() => setSearchTerm('')}
                 style={{
                   marginTop: '20px',
@@ -349,7 +384,7 @@ const Remedies = () => {
                   color: 'white',
                   border: 'none',
                   borderRadius: '5px',
-                  cursor: 'pointer'
+                  cursor: 'pointer',
                 }}
               >
                 Clear Search
@@ -358,43 +393,46 @@ const Remedies = () => {
           </NoResults>
         ) : (
           <RemedyGrid>
-            {remediesToDisplay.map((remedy, index) => (
+            {remediesToDisplay.map((remedy) => (
               <RemedyCard
                 key={remedy.id}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.5, delay: index * 0.05 }}
+                variants={itemVariants}
+                initial="hidden"
+                animate="visible"
               >
+                <CardImage>
+                  {remedy.image_url ? (
+                    <img src={remedy.image_url} alt={remedy.problem} />
+                  ) : (
+                    <FaLeaf />
+                  )}
+                </CardImage>
                 <CardHeader>
                   <ProblemTitle>
                     <FaLeaf />
-                    {remedy.problem || 'Unknown'}
+                    {remedy.problem}
                   </ProblemTitle>
                   <FavoriteButton
                     onClick={() => toggleFavorite(remedy.id)}
-                    isFavorite={favorites.includes(remedy.id)}
+                    $isFavorite={favorites.includes(remedy.id)}
                   >
                     {favorites.includes(remedy.id) ? <FaHeart /> : <FaRegHeart />}
                   </FavoriteButton>
                 </CardHeader>
-                
-                <SectionTitle>Ingredients:</SectionTitle>
-                <Text>{remedy.ingredients || 'No ingredients listed'}</Text>
-                
-                <SectionTitle>How to Use:</SectionTitle>
-                <Text>{remedy.steps || 'No steps provided'}</Text>
-                
+
+                <SectionLabel>Ingredients:</SectionLabel>
+                <Text>{remedy.ingredients}</Text>
+
+                <SectionLabel>How to Use:</SectionLabel>
+                <Text>{remedy.steps}</Text>
+
                 {remedy.precautions && (
                   <>
-                    <SectionTitle>Precautions:</SectionTitle>
+                    <SectionLabel>Precautions:</SectionLabel>
                     <Text style={{ fontSize: '0.9rem', fontStyle: 'italic' }}>
                       {remedy.precautions}
                     </Text>
                   </>
-                )}
-                
-                {remedy.category && (
-                  <CategoryBadge>{remedy.category}</CategoryBadge>
                 )}
               </RemedyCard>
             ))}

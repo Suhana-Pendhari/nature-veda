@@ -163,7 +163,13 @@ const Login = () => {
       if (isLogin) {
         const result = await login(formData.email, formData.password);
         if (result.success) {
-          navigate('/');
+          // Check if user is admin and redirect accordingly
+          const user = result.data.user;
+          if (user && user.is_admin) {
+            navigate('/admin/dashboard');
+          } else {
+            navigate('/');
+          }
         } else {
           setError(result.error);
         }
@@ -257,12 +263,6 @@ const Login = () => {
               {isLogin ? 'Register' : 'Login'}
             </ToggleLink>
           </ToggleText>
-          
-          <div style={{ textAlign: 'center', marginTop: '20px' }}>
-            <Link to="/admin" style={{ color: 'var(--light-brown)', fontSize: '0.9rem' }}>
-              Admin Login →
-            </Link>
-          </div>
         </LoginCard>
       </LoginSection>
       <Footer />

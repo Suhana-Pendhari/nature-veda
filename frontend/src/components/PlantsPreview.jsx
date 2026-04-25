@@ -33,8 +33,20 @@ const SectionSubtitle = styled.p`
 
 const PlantGrid = styled.div`
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  grid-template-columns: repeat(4, minmax(0, 1fr));
   gap: 30px;
+
+  @media (max-width: 1200px) {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  @media (max-width: 900px) {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  @media (max-width: 600px) {
+    grid-template-columns: 1fr;
+  }
 `;
 
 const PlantCard = styled(motion.div)`
@@ -159,7 +171,7 @@ const PlantsPreview = () => {
   const fetchPlants = async () => {
     try {
       const response = await axios.get('http://localhost:8000/api/plants/get_plants.php');
-      setPlants(response.data.slice(0, 3)); // Show only 3 plants
+      setPlants(response.data.slice(0, 4)); // Show only 3 plants
       setLoading(false);
     } catch (error) {
       console.error('Error fetching plants:', error);
@@ -231,9 +243,9 @@ const PlantsPreview = () => {
                   {plant.name}
                 </PlantName>
                 <SectionLabel>Uses:</SectionLabel>
-                <Text>{plant.uses.substring(0, 80)}...</Text>
+                <Text>{plant.uses}</Text>
                 <SectionLabel>Benefits:</SectionLabel>
-                <Text>{plant.benefits.substring(0, 80)}...</Text>
+                <Text>{plant.benefits}</Text>
               </PlantContent>
             </PlantCard>
           ))}

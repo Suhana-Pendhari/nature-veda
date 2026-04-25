@@ -4,7 +4,6 @@ import Hero from '../components/Hero';
 import Categories from '../components/Categories';
 import RemediesPreview from '../components/RemediesPreview';
 import PlantsPreview from '../components/PlantsPreview';
-import BeautyCare from '../components/BeautyCare';
 import Footer from '../components/Footer';
 import LoadingSpinner from '../components/LoadingSpinner';
 import { motion } from 'framer-motion';
@@ -32,7 +31,6 @@ const Home = () => {
       <Categories />
       <RemediesPreview />
       <PlantsPreview />
-      <BeautyCare />
       <Footer />
     </motion.div>
   );

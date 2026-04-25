@@ -1,8 +1,20 @@
 <?php
 // backend/config/database.php
-header("Access-Control-Allow-Origin: http://localhost:3000");
+$allowed_origins = [
+    'http://localhost:3000',
+    'http://localhost:3001',
+    'http://127.0.0.1:3000',
+    'http://127.0.0.1:3001'
+];
+$origin = $_SERVER['HTTP_ORIGIN'] ?? '';
+if (in_array($origin, $allowed_origins, true)) {
+    header("Access-Control-Allow-Origin: $origin");
+} else {
+    header("Access-Control-Allow-Origin: http://localhost:3000");
+}
 header("Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS");
 header("Access-Control-Allow-Headers: Content-Type, Authorization");
+header("Access-Control-Allow-Credentials: true");
 header("Content-Type: application/json");
 
 if ($_SERVER['REQUEST_METHOD'] == 'OPTIONS' && !defined('ALLOW_OPTIONS')) {
@@ -15,68 +27,70 @@ $dbname = 'natureveda';
 $username = 'root';
 $password = '';
 
-// Force SQLite for development
-$dbDir = __DIR__ . '/../database';
-if (!is_dir($dbDir)) {
-    mkdir($dbDir, 0777, true);
+try {
+    $pdo = new PDO("mysql:host=$host;dbname=$dbname;charset=utf8", $username, $password);
+    $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
+    define('DB_TYPE', 'mysql');
+} catch (PDOException $e) {
+    die("Database connection failed: " . $e->getMessage());
 }
-$dbPath = $dbDir . '/natureveda.db';
-$pdo = new PDO("sqlite:$dbPath");
-$pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
-define('DB_TYPE', 'sqlite');
 
-// Create tables if they don't exist
+// Always ensure schema exists (safe), but do NOT insert any default/sample data.
+// This keeps the app working while guaranteeing "only admin-created data is shown".
 $pdo->exec("
     CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
-        email TEXT UNIQUE NOT NULL,
-        password TEXT NOT NULL,
-        is_admin INTEGER DEFAULT 0,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
+        email VARCHAR(100) UNIQUE NOT NULL,
+        password VARCHAR(255) NOT NULL,
+        is_admin BOOLEAN DEFAULT FALSE,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB;
 ");
 
 $pdo->exec("
     CREATE TABLE IF NOT EXISTS remedies (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        problem TEXT NOT NULL,
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        problem VARCHAR(200) NOT NULL,
         ingredients TEXT NOT NULL,
         steps TEXT NOT NULL,
         precautions TEXT,
-        category TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
+        category VARCHAR(50),
+        image_url VARCHAR(500),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB;
 ");
+
+// If tables already existed from earlier versions, ensure new columns exist.
+// We intentionally ignore "duplicate column" errors so this is safe to run.
+try { $pdo->exec("ALTER TABLE remedies ADD COLUMN precautions TEXT NULL"); } catch (PDOException $e) {}
+try { $pdo->exec("ALTER TABLE remedies ADD COLUMN category VARCHAR(50) NULL"); } catch (PDOException $e) {}
+try { $pdo->exec("ALTER TABLE remedies ADD COLUMN image_url VARCHAR(500) NULL"); } catch (PDOException $e) {}
 
 $pdo->exec("
     CREATE TABLE IF NOT EXISTS plants (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT NOT NULL,
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        name VARCHAR(100) NOT NULL,
         uses TEXT NOT NULL,
         benefits TEXT NOT NULL,
-        image_url TEXT,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP
-    )
+        category VARCHAR(80),
+        image_url VARCHAR(500),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+    ) ENGINE=InnoDB;
 ");
+
+try { $pdo->exec("ALTER TABLE plants ADD COLUMN image_url VARCHAR(500) NULL"); } catch (PDOException $e) {}
+try { $pdo->exec("ALTER TABLE plants ADD COLUMN category VARCHAR(80) NULL"); } catch (PDOException $e) {}
 
 $pdo->exec("
     CREATE TABLE IF NOT EXISTS favorites (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        user_id INTEGER NOT NULL,
-        remedy_id INTEGER NOT NULL,
-        created_at DATETIME DEFAULT CURRENT_TIMESTAMP,
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        user_id INT NOT NULL,
+        remedy_id INT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
+        UNIQUE KEY unique_favorite (user_id, remedy_id),
         FOREIGN KEY (user_id) REFERENCES users(id) ON DELETE CASCADE,
         FOREIGN KEY (remedy_id) REFERENCES remedies(id) ON DELETE CASCADE
-    )
+    ) ENGINE=InnoDB;
 ");
-
-// Insert admin user if not exists
-$adminPassword = password_hash('admin123', PASSWORD_DEFAULT);
-$stmt = $pdo->prepare("INSERT OR IGNORE INTO users (name, email, password, is_admin) VALUES (?, ?, ?, ?)");
-$stmt->execute(['Admin', 'admin@natureveda.com', $adminPassword, 1]);
-
-// Insert sample remedy if not exists
-$stmt = $pdo->prepare("INSERT OR IGNORE INTO remedies (problem, ingredients, steps, precautions, category) VALUES (?, ?, ?, ?, ?)");
-$stmt->execute(['Cough & Cold', 'Tulsi leaves, Ginger, Honey, Black pepper', '1. Boil 5-6 tulsi leaves with ginger\n2. Add honey and black pepper\n3. Drink warm twice daily', 'Avoid cold water and ice cream', 'Cough & Cold']);
 ?>
